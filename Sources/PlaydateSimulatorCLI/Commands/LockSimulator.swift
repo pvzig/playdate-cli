@@ -1,12 +1,12 @@
 import ArgumentParser
 
 struct LockSimulator: SimulatorControlCommand {
-  static let configuration = CommandConfiguration(
-    commandName: "lock",
-    abstract: "Toggle the Simulator lock state."
-  )
+    static let configuration = CommandConfiguration(
+        commandName: "lock",
+        abstract: "Toggle the Simulator lock state."
+    )
 
-  @OptionGroup var simulatorOptions: SimulatorOptions
+    @OptionGroup var simulatorOptions: SimulatorOptions
 
-  var simulatorCommand: SimulatorCommand { .lock }
+    var simulatorCommand: SimulatorCommand { .lock }
 }

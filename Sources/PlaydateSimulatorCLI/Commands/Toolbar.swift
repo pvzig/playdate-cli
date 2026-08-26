@@ -1,16 +1,16 @@
 import ArgumentParser
 
 struct Toolbar: SimulatorControlCommand {
-  static let configuration = CommandConfiguration(
-    abstract: "Invoke an exact Simulator toolbar action."
-  )
+    static let configuration = CommandConfiguration(
+        abstract: "Invoke an exact Simulator toolbar action."
+    )
 
-  @OptionGroup var simulatorOptions: SimulatorOptions
+    @OptionGroup var simulatorOptions: SimulatorOptions
 
-  @Argument(help: "The toolbar action to invoke.")
-  var action: ToolbarAction
+    @Argument(help: "The toolbar action to invoke.")
+    var action: ToolbarAction
 
-  var simulatorCommand: SimulatorCommand {
-    .toolbar(action)
-  }
+    var simulatorCommand: SimulatorCommand {
+        .toolbar(action)
+    }
 }

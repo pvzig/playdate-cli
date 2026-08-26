@@ -1,11 +1,11 @@
 import ArgumentParser
 
 struct Pause: SimulatorControlCommand {
-  static let configuration = CommandConfiguration(
-    abstract: "Pause Simulator."
-  )
+    static let configuration = CommandConfiguration(
+        abstract: "Pause Simulator."
+    )
 
-  @OptionGroup var simulatorOptions: SimulatorOptions
+    @OptionGroup var simulatorOptions: SimulatorOptions
 
-  var simulatorCommand: SimulatorCommand { .pause }
+    var simulatorCommand: SimulatorCommand { .pause }
 }

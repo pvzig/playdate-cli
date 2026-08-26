@@ -1,4 +1,4 @@
 enum CrankDockState: Sendable {
-  case docked
-  case undocked
+    case docked
+    case undocked
 }

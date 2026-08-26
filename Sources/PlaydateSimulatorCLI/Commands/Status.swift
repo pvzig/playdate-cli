@@ -1,11 +1,11 @@
 import ArgumentParser
 
 struct Status: SimulatorControlCommand {
-  static let configuration = CommandConfiguration(
-    abstract: "Show agent process and capability status."
-  )
+    static let configuration = CommandConfiguration(
+        abstract: "Show agent process and capability status."
+    )
 
-  @OptionGroup var simulatorOptions: SimulatorOptions
+    @OptionGroup var simulatorOptions: SimulatorOptions
 
-  var simulatorCommand: SimulatorCommand { .status }
+    var simulatorCommand: SimulatorCommand { .status }
 }
