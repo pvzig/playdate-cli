@@ -5,6 +5,13 @@ macOS Playdate Simulator. An agent can build a project, load its PDX, send every
 Playdate input, operate the useful Simulator toolbar actions, and capture the
 screen without coordinate-based clicks or Accessibility automation.
 
+## Prerequisite
+
+Install the [Playdate SDK for macOS](https://play.date/dev/) before using
+`playdate-simctl`. Download it from Panic and run the installer; the SDK includes
+Playdate Simulator. The default installation is discovered automatically. For a
+custom location, set `PLAYDATE_SDK_PATH` or pass `--simulator-app`.
+
 > [!WARNING]
 > The input bridge uses private symbols exported by Playdate Simulator and
 > injects a small dynamic library with LLDB. It can break after an SDK update.
