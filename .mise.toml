@@ -1,0 +1,21 @@
+[tools]
+swift = "6.3.3"
+
+[tasks.build]
+description = "Build the injected agent and CLI"
+run = [
+  "swift build --product PlaydateSimulatorAgent",
+  "swift build --product playdate-simctl",
+]
+
+[tasks.format]
+description = "Format Swift sources and tests"
+run = "swift-format format . --recursive --parallel -i"
+
+[tasks.test]
+description = "Run the test suite"
+run = "swift test --parallel"
+
+[tasks.check]
+description = "Build and test all products"
+depends = ["build", "test"]
