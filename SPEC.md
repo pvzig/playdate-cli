@@ -40,6 +40,10 @@ The Swift 6.3 CLI uses swift-argument-parser and swift-subprocess. It selects
 Simulator from `--simulator-app`, `PLAYDATE_SDK_PATH`, or
 `~/Developer/PlaydateSDK`, in that order.
 
+Swift sources are grouped by commands, agent communication, Simulator access,
+project execution, and control values. Shared orchestration, path handling, and
+subprocess support remain at the target root.
+
 Before dispatch, the controller verifies the selected process with
 `proc_pidpath` and checks the agent's protocol, PID, and capabilities. Injection
 uses `nm` to verify required private symbols and LLDB to load the adjacent agent
