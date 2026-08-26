@@ -15,6 +15,7 @@ custom location, set `PLAYDATE_SDK_PATH` or pass `--simulator-app`.
 > [!WARNING]
 > The input bridge uses private symbols exported by Playdate Simulator and
 > injects a small dynamic library with LLDB. It can break after an SDK update.
+> Last validated against Playdate SDK 3.1.1.
 > The CLI verifies the selected executable and agent compatibility before every
 > command, verifies the socket peer on every request, and never modifies the
 > Simulator app on disk.
