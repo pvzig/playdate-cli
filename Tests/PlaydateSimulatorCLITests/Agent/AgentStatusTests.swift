@@ -31,7 +31,7 @@ struct AgentStatusTests {
 
     @Test("Rejects duplicate fields")
     func rejectsDuplicateFields() {
-        #expect(throws: CLIError.self) {
+        #expect(throws: CLIError.agentUnavailable("duplicate agent status field: pid")) {
             try AgentStatus.validate(
                 response:
                     "ok protocol=1 pid=42 pid=42 buttons=1 crank=1 dock=1 accelerometer=1 lock=1 volume=1 ui=1 screenshot=1 load=1 record=1",

@@ -1,5 +1,7 @@
+import Foundation
+
 struct ProjectRun: Equatable, Sendable {
-    let projectDirectory: String
-    let productPath: String
+    let projectDirectoryURL: URL
+    let productURL: URL
     let buildTask: String
 }

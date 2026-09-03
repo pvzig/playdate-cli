@@ -37,8 +37,11 @@ struct CommandValidationTests {
             try run.simulatorCommand
                 == .run(
                     ProjectRun(
-                        projectDirectory: "/tmp/example-project",
-                        productPath: "/tmp/example-project/.build/Game.pdx",
+                        projectDirectoryURL: URL(
+                            filePath: "/tmp/example-project",
+                            directoryHint: .isDirectory
+                        ),
+                        productURL: URL(filePath: "/tmp/example-project/.build/Game.pdx"),
                         buildTask: "pdx"
                     )
                 )
@@ -53,7 +56,11 @@ struct CommandValidationTests {
         defer { try? FileManager.default.removeItem(at: temporaryURL) }
 
         let load = try Load.parse([temporaryURL.path])
-        #expect(throws: CLIError.self) {
+        #expect(
+            throws: CLIError.invalidArgument(
+                "PDX directory bundle was not found at \(temporaryURL.path)"
+            )
+        ) {
             _ = try load.simulatorCommand
         }
     }
@@ -74,7 +81,7 @@ struct CommandValidationTests {
     @Test("Requires a PDX extension for project runs")
     func validatesRunProductExtension() throws {
         let run = try Run.parse([".build/Game"])
-        #expect(throws: CLIError.self) {
+        #expect(throws: CLIError.invalidArgument("run product must use the .pdx extension")) {
             _ = try run.simulatorCommand
         }
     }
@@ -174,7 +181,7 @@ struct CommandValidationTests {
         ]
     )
     func rejectsUnframeablePath(command: String, path: String) throws {
-        #expect(throws: CLIError.self) {
+        #expect(throws: CLIError.invalidArgument("agent commands cannot contain line breaks")) {
             switch command {
             case "screenshot":
                 _ = try Screenshot.parse([path]).simulatorCommand

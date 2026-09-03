@@ -43,8 +43,8 @@ struct Run: SimulatorControlCommand {
 
             return .run(
                 ProjectRun(
-                    projectDirectory: projectURL.path,
-                    productPath: productURL.path,
+                    projectDirectoryURL: projectURL,
+                    productURL: productURL,
                     buildTask: buildTask
                 )
             )

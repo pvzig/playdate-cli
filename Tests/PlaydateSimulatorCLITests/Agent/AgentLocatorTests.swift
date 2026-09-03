@@ -22,8 +22,7 @@ struct AgentLocatorTests {
         let executableURL = installationDirectory.appending(path: "playdate-simctl")
         let linkURL = linkDirectory.appending(path: "playdate-simctl")
         let agentURL = installationDirectory.appending(path: "libPlaydateSimulatorAgent.dylib")
-        #expect(FileManager.default.createFile(atPath: executableURL.path, contents: Data()))
-        #expect(FileManager.default.createFile(atPath: agentURL.path, contents: Data()))
+        try #require(FileManager.default.createFile(atPath: executableURL.path, contents: Data()))
         try FileManager.default.createSymbolicLink(at: linkURL, withDestinationURL: executableURL)
 
         #expect(AgentLocator.agentURL(adjacentTo: linkURL) == agentURL)

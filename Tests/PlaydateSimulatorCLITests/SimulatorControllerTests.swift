@@ -101,7 +101,7 @@ struct SimulatorControllerTests {
         #expect(response == "ok")
         #expect(
             await agentRecorder.recordedRequests()
-                == [.status, .setActivePDX(path: fixture.projectRun.productPath)]
+                == [.status, .setActivePDX(path: fixture.projectRun.productURL.path)]
         )
     }
 
@@ -133,7 +133,7 @@ struct SimulatorControllerTests {
         #expect(response == "ok")
         #expect(
             await agentRecorder.recordedRequests()
-                == [.status, .load(path: fixture.projectRun.productPath)]
+                == [.status, .load(path: fixture.projectRun.productURL.path)]
         )
     }
 
@@ -242,8 +242,8 @@ private struct ProjectRunFixture {
             withIntermediateDirectories: true
         )
         projectRun = ProjectRun(
-            projectDirectory: rootURL.path,
-            productPath: productURL.path,
+            projectDirectoryURL: rootURL,
+            productURL: productURL,
             buildTask: "build"
         )
     }

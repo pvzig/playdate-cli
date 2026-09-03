@@ -42,10 +42,12 @@ Simulator from `--simulator-app`, `PLAYDATE_SDK_PATH`, or
 
 Swift sources are grouped by commands, agent communication, Simulator access,
 project execution, and control values. Shared orchestration, path handling, and
-subprocess support remain at the target root.
+subprocess support remain at the target root. Resolved project locations stay
+as URLs until they cross a subprocess or agent-protocol boundary.
 
-Before dispatch, the controller verifies the selected process with
-`proc_pidpath` and checks the agent's protocol, PID, and capabilities. Injection
+Before dispatch, the controller verifies the selected process synchronously
+with `proc_pidpath` and checks the agent's protocol, PID, and capabilities.
+Agent-backed commands share one preflight and one-retry recovery path. Injection
 uses `nm` to verify required private symbols and LLDB to load the adjacent agent
 library. A missing or refused socket triggers injection and one retry; other
 transport or compatibility failures remain visible.

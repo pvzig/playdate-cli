@@ -56,7 +56,7 @@ struct SimulatorProcessLocator: Sendable {
     func verify(
         processIdentifier: Int32,
         installation: SimulatorInstallation
-    ) async throws {
+    ) throws {
         guard let reportedPath = executablePathProvider(processIdentifier) else {
             throw CLIError.simulatorUnavailable(
                 "could not inspect the executable for process \(processIdentifier)"

@@ -35,7 +35,7 @@ struct SimulatorController: Sendable {
             )
             preLaunchProcessIdentifier = existingProcessIdentifier
             if let existingProcessIdentifier {
-                try await processLocator.verify(
+                try processLocator.verify(
                     processIdentifier: existingProcessIdentifier,
                     installation: installation
                 )
@@ -54,11 +54,12 @@ struct SimulatorController: Sendable {
                 waitsForLaunch: invocation.command.isProjectRun
             )
         }
-        try await processLocator.verify(
+        try processLocator.verify(
             processIdentifier: processIdentifier,
             installation: installation
         )
 
+        let request: AgentRequest
         switch invocation.command {
         case .status, .inject:
             return try await ensureAgent(
@@ -67,49 +68,25 @@ struct SimulatorController: Sendable {
                 agentPath: invocation.agentPath
             )
         case .run(let projectRun):
-            _ = try await ensureAgent(
-                processIdentifier: processIdentifier,
-                installation: installation,
-                agentPath: invocation.agentPath
-            )
-            if launchedProductOnColdStart {
-                return try await performWithAgentRecovery(
-                    processIdentifier: processIdentifier,
-                    installation: installation,
-                    agentPath: invocation.agentPath
-                ) {
-                    try await agentClient.send(
-                        .setActivePDX(path: projectRun.productPath),
-                        processIdentifier: processIdentifier
-                    )
-                }
-            }
-            return try await performWithAgentRecovery(
-                processIdentifier: processIdentifier,
-                installation: installation,
-                agentPath: invocation.agentPath
-            ) {
-                try await agentClient.send(
-                    .load(path: projectRun.productPath),
-                    processIdentifier: processIdentifier
-                )
-            }
+            request =
+                launchedProductOnColdStart
+                ? .setActivePDX(path: projectRun.productURL.path)
+                : .load(path: projectRun.productURL.path)
         default:
-            _ = try await ensureAgent(
-                processIdentifier: processIdentifier,
-                installation: installation,
-                agentPath: invocation.agentPath
-            )
-            return try await performWithAgentRecovery(
-                processIdentifier: processIdentifier,
-                installation: installation,
-                agentPath: invocation.agentPath
-            ) {
-                try await agentClient.send(
-                    AgentRequest(command: invocation.command),
-                    processIdentifier: processIdentifier
-                )
-            }
+            request = try AgentRequest(command: invocation.command)
+        }
+
+        _ = try await ensureAgent(
+            processIdentifier: processIdentifier,
+            installation: installation,
+            agentPath: invocation.agentPath
+        )
+        return try await performWithAgentRecovery(
+            processIdentifier: processIdentifier,
+            installation: installation,
+            agentPath: invocation.agentPath
+        ) {
+            try await agentClient.send(request, processIdentifier: processIdentifier)
         }
     }
 
@@ -185,7 +162,7 @@ struct SimulatorController: Sendable {
         installation: SimulatorInstallation,
         agentPath: String?
     ) async throws -> String {
-        try await processLocator.verify(
+        try processLocator.verify(
             processIdentifier: processIdentifier,
             installation: installation
         )
@@ -215,8 +192,6 @@ struct SimulatorController: Sendable {
                     throw readinessError
                 }
                 try await clock.sleep(for: .milliseconds(50))
-            } catch {
-                throw error
             }
         }
 

@@ -16,13 +16,13 @@ struct GIFEncoderTests {
         let outputURL = FileManager.default.temporaryDirectory
             .appending(path: "playdate-cli-gif-\(UUID().uuidString)")
             .appendingPathExtension("gif")
-        #expect(FileManager.default.createFile(atPath: outputURL.path, contents: nil))
+        try #require(FileManager.default.createFile(atPath: outputURL.path, contents: nil))
         defer { try? FileManager.default.removeItem(at: outputURL) }
 
         let file = try FileHandle(forWritingTo: outputURL)
         let encoderDescriptor = dup(file.fileDescriptor)
         try file.close()
-        #expect(encoderDescriptor >= 0)
+        try #require(encoderDescriptor >= 0)
 
         let encoder = try #require(
             pdsim_gif_encoder_create(
@@ -54,7 +54,7 @@ struct GIFEncoderTests {
             }
         }
 
-        #expect(
+        try #require(
             blackFrame.withUnsafeBytes { frame in
                 pdsim_gif_encoder_add_frame(
                     encoder,
@@ -64,7 +64,7 @@ struct GIFEncoderTests {
                 )
             }
         )
-        #expect(
+        try #require(
             splitFrame.withUnsafeBytes { frame in
                 pdsim_gif_encoder_add_frame(
                     encoder,
@@ -74,7 +74,7 @@ struct GIFEncoderTests {
                 )
             }
         )
-        #expect(
+        try #require(
             noiseFrame.withUnsafeBytes { frame in
                 pdsim_gif_encoder_add_frame(
                     encoder,
@@ -84,7 +84,7 @@ struct GIFEncoderTests {
                 )
             }
         )
-        #expect(pdsim_gif_encoder_finish(encoder))
+        try #require(pdsim_gif_encoder_finish(encoder))
 
         let source = try #require(CGImageSourceCreateWithURL(outputURL as CFURL, nil))
         #expect(CGImageSourceGetCount(source) == 3)

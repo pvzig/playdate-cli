@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import PlaydateSimulatorCLI
@@ -65,12 +66,12 @@ struct AgentRequestTests {
 
     @Test("Does not treat project run as an agent request")
     func rejectsProjectRun() {
-        #expect(throws: CLIError.self) {
+        #expect(throws: CLIError.invalidArgument("command is not an agent request")) {
             try AgentRequest(
                 command: .run(
                     ProjectRun(
-                        projectDirectory: "/tmp/project",
-                        productPath: "/tmp/project/Game.pdx",
+                        projectDirectoryURL: URL(filePath: "/tmp/project"),
+                        productURL: URL(filePath: "/tmp/project/Game.pdx"),
                         buildTask: "build"
                     )
                 )

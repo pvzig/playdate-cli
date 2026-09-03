@@ -9,14 +9,14 @@ struct ProjectRunner: Sendable {
 
     func build(_ projectRun: ProjectRun) async throws {
         try PathValidation.requireDirectory(
-            at: URL(filePath: projectRun.projectDirectory, directoryHint: .isDirectory),
-            message: "project directory does not exist: \(projectRun.projectDirectory)"
+            at: projectRun.projectDirectoryURL,
+            message: "project directory does not exist: \(projectRun.projectDirectoryURL.path)"
         )
 
         let buildResult = try await subprocessRunner.run(
             executable: "/usr/bin/env",
             arguments: ["mise", "run", projectRun.buildTask],
-            workingDirectory: projectRun.projectDirectory,
+            workingDirectory: projectRun.projectDirectoryURL.path,
             outputLimit: 1024 * 1024
         )
         guard buildResult.succeeded else {
@@ -26,9 +26,9 @@ struct ProjectRunner: Sendable {
         }
 
         try PathValidation.requireDirectory(
-            at: URL(filePath: projectRun.productPath),
+            at: projectRun.productURL,
             message:
-                "build completed but no PDX directory bundle was found at \(projectRun.productPath)"
+                "build completed but no PDX directory bundle was found at \(projectRun.productURL.path)"
         )
     }
 
@@ -38,7 +38,7 @@ struct ProjectRunner: Sendable {
     ) async throws {
         let launchResult = try await subprocessRunner.run(
             executable: "/usr/bin/open",
-            arguments: ["-a", installation.appURL.path, "--args", projectRun.productPath]
+            arguments: ["-a", installation.appURL.path, "--args", projectRun.productURL.path]
         )
         guard launchResult.succeeded else {
             throw CLIError.subprocessFailed(

@@ -27,7 +27,7 @@ struct SimulatorProcessLocatorTests {
     }
 
     @Test("Verifies the kernel-reported executable path")
-    func verifiesExecutablePath() async throws {
+    func verifiesExecutablePath() throws {
         let installation = SimulatorInstallation(
             overridePath: "/Applications/Selected/Playdate Simulator.app"
         )
@@ -35,11 +35,11 @@ struct SimulatorProcessLocatorTests {
             executablePathProvider: { _ in installation.executableURL.path }
         )
 
-        try await locator.verify(processIdentifier: 42, installation: installation)
+        try locator.verify(processIdentifier: 42, installation: installation)
     }
 
     @Test("Rejects a process whose executable does not match the selected installation")
-    func rejectsDifferentExecutable() async {
+    func rejectsDifferentExecutable() {
         let installation = SimulatorInstallation(
             overridePath: "/Applications/Selected/Playdate Simulator.app"
         )
@@ -50,7 +50,7 @@ struct SimulatorProcessLocatorTests {
         )
 
         do {
-            try await locator.verify(processIdentifier: 42, installation: installation)
+            try locator.verify(processIdentifier: 42, installation: installation)
             Issue.record("Expected the executable mismatch to be rejected")
         } catch CLIError.simulatorUnavailable(let message) {
             #expect(message.contains("is not the selected Playdate Simulator"))
