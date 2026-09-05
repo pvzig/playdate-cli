@@ -21,6 +21,8 @@ diagnostics. Every executable leaf command accepts `--pid`, `--agent`, and
 the PDX relative to the project directory, runs `mise run <task>`, requires a
 `.pdx` directory bundle, and opens it in the selected Simulator. A cold launch
 registers the active PDX; a running Simulator receives one `load` request.
+Before building or launching, `run` validates that the resolved PDX path fits
+the longer cold-start registration request within the protocol limit.
 
 `load` requires an existing `.pdx` directory bundle. `restart` reloads the PDX
 established by `run` or `load`, falling back to Simulator's native restart when
@@ -79,3 +81,6 @@ control a physical Playdate.
 Code changes must pass swift-format, `swift test --parallel`, and
 `mise run build`. Changes to private Simulator behavior, injection, or capture
 also require live Simulator validation.
+
+Regression coverage checks GIF end-code completeness when the final prefix
+grows the LZW code width, and `run` path validation at the cold-start byte limit.

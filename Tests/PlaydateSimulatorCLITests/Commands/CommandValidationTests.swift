@@ -86,6 +86,38 @@ struct CommandValidationTests {
         }
     }
 
+    @Test("Accepts a run product at the cold-start request size limit")
+    func acceptsMaximumRunProductPath() throws {
+        let productPath = runProductPath(byteCount: 495)
+        let run = try Run.parse([productPath])
+        guard case .run(let projectRun) = try run.simulatorCommand else {
+            Issue.record("Expected a project run")
+            return
+        }
+
+        #expect(projectRun.productURL.path == productPath)
+        #expect(
+            AgentRequest.setActivePDX(path: productPath).line.utf8.count
+                == AgentProtocol.maximumLineByteCount
+        )
+    }
+
+    @Test(
+        "Rejects run products that fit load but exceed cold-start registration",
+        arguments: [496, 500, 505]
+    )
+    func rejectsOversizedColdStartPath(byteCount: Int) throws {
+        let productPath = runProductPath(byteCount: byteCount)
+        try AgentProtocol.validate(line: AgentRequest.load(path: productPath).line)
+        let run = try Run.parse([productPath])
+
+        #expect(
+            throws: CLIError.invalidArgument("agent command exceeds the 510-byte protocol limit")
+        ) {
+            _ = try run.simulatorCommand
+        }
+    }
+
     @Test("Maps press targets and durations")
     func mapsPress() throws {
         #expect(
@@ -193,5 +225,13 @@ struct CommandValidationTests {
                 Issue.record("Unknown fixture command: \(command)")
             }
         }
+    }
+
+    private func runProductPath(byteCount: Int) -> String {
+        let directory =
+            "/tmp/" + String(repeating: "a", count: 200)
+            + "/" + String(repeating: "b", count: 200) + "/"
+        return directory + String(repeating: "c", count: byteCount - directory.utf8.count - 4)
+            + ".pdx"
     }
 }

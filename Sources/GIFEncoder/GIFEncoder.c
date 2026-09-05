@@ -238,8 +238,15 @@ static bool pdsim_write_lzw_frame(
         prefix = suffix;
     }
 
-    return pdsim_write_lzw_code(&output, prefix, code_width)
-        && pdsim_write_lzw_code(&output, PDSIM_GIF_LZW_END_CODE, code_width)
+    if (!pdsim_write_lzw_code(&output, prefix, code_width)) {
+        return false;
+    }
+    // Decoding the final prefix adds one last dictionary entry. The end code
+    // must use the decoder's resulting width, even though no pixels remain.
+    if (code_width < 12 && next_code == (uint16_t)(1U << code_width)) {
+        code_width++;
+    }
+    return pdsim_write_lzw_code(&output, PDSIM_GIF_LZW_END_CODE, code_width)
         && pdsim_finish_lzw_output(&output);
 }
 

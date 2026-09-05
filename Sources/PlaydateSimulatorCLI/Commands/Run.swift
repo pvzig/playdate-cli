@@ -39,7 +39,8 @@ struct Run: SimulatorControlCommand {
             )
             let productURL = PathValidation.resolve(productPath, relativeTo: projectURL)
             try PathValidation.requireExtension("pdx", for: productURL, description: "run product")
-            try AgentProtocol.validate(line: "load \(productURL.path)")
+            // Cold-start registration has the longer request prefix.
+            try AgentProtocol.validate(line: AgentRequest.setActivePDX(path: productURL.path).line)
 
             return .run(
                 ProjectRun(

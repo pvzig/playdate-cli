@@ -11,6 +11,47 @@ struct GIFEncoderTests {
     private let height = 240
     private let bytesPerRow = 52
 
+    @Test(
+        "Writes a complete end code when the final prefix grows the dictionary width",
+        arguments: [(56, UInt8(0x50)), (66, UInt8(0x5F))]
+    )
+    func writesEndCodeAtWidthBoundary(pixelCount: Int, lastPackedByte: UInt8) throws {
+        let outputURL = FileManager.default.temporaryDirectory
+            .appending(path: "playdate-cli-gif-boundary-\(UUID().uuidString).gif")
+        try #require(FileManager.default.createFile(atPath: outputURL.path, contents: nil))
+        defer { try? FileManager.default.removeItem(at: outputURL) }
+
+        let file = try FileHandle(forWritingTo: outputURL)
+        let encoderDescriptor = dup(file.fileDescriptor)
+        try file.close()
+        try #require(encoderDescriptor >= 0)
+        let encoder = try #require(
+            pdsim_gif_encoder_create(encoderDescriptor, UInt16(pixelCount), 1)
+        )
+        defer { pdsim_gif_encoder_destroy(encoder) }
+
+        let frame = [UInt8](repeating: 0, count: (pixelCount + 7) / 8)
+        try #require(
+            frame.withUnsafeBytes { bytes in
+                pdsim_gif_encoder_add_frame(
+                    encoder,
+                    bytes.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                    frame.count,
+                    2
+                )
+            }
+        )
+        try #require(pdsim_gif_encoder_finish(encoder))
+
+        // The clear code and black runs fill the four-bit dictionary. The final
+        // prefix makes the end code five bits wide, requiring one more byte.
+        let expectedImageData: [UInt8] = [
+            2, 7, 0x84, 0x8F, 0xA9, 0xCB, 0xED, lastPackedByte, 0, 0, 0x3B,
+        ]
+        let data = try Data(contentsOf: outputURL)
+        #expect(Array(data.suffix(expectedImageData.count)) == expectedImageData)
+    }
+
     @Test("Round-trips packed frames, timing, and row padding")
     func roundTripsFrames() throws {
         let outputURL = FileManager.default.temporaryDirectory
